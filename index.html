@@ -1,138 +1,47 @@
-
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Tonguebox – KI</title><style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#10232a;background:#fff;font-size:20px}main{max-width:720px;margin:auto;padding:14px 12px 60px}h1{text-align:center;font-size:44px;margin:8px 0}.sub,.status{text-align:center;font-weight:700}.note{border:2px solid #087f8c;background:#eefafb;border-radius:18px;padding:14px;text-align:center;font-weight:700;margin:12px 0}.top,.answers,.quick{display:grid;grid-template-columns:1fr 1fr;gap:12px}.big,.answer,.full,.quick button,.acc-head{border:0;border-radius:20px;font-weight:800;font-size:23px;min-height:90px;padding:14px}.start,.answer,.full{background:#087f8c;color:#fff}.stop,.quick button{background:#edf2f3;color:#10232a}.answer{min-height:115px}.question{border:2px solid #cfd8dc;background:#f4f8f9;border-radius:18px;padding:14px;min-height:76px;margin:14px 0}.question small{display:block;font-size:15px;font-weight:700}.status{min-height:30px;margin:10px}.error{color:#9b1c1c}.acc{border:2px solid #cfd8dc;border-radius:20px;overflow:hidden;margin:14px 0}.acc-head{width:100%;background:#eaf5f6;text-align:left;display:flex;justify-content:space-between;align-items:center}.panel{display:none;padding:14px}.panel.open{display:block}textarea{width:100%;min-height:125px;border:3px solid #cfd8dc;border-radius:18px;padding:14px;font:inherit;font-size:22px}.full{width:100%;margin-top:12px}button:focus-visible,textarea:focus-visible{outline:7px solid #ffd400;outline-offset:3px}/* Blickerfassung / iPhone: große, klar getrennte Ziele */
-button{
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
-}
-.top{gap:18px}
-.answers{gap:18px}
-.big{
-  min-height:112px;
-  font-size:26px;
-}
-.answer{
-  min-height:132px;
-  font-size:25px;
-  padding:20px 16px;
-}
-.acc{margin:20px 0}
-.acc-head{
-  min-height:112px;
-  font-size:26px;
-  padding:20px;
-}
-.quick{gap:16px}
-.quick button{
-  min-height:112px;
-  font-size:24px;
-  padding:18px 12px;
-}
-.full{
-  min-height:106px;
-  font-size:25px;
-}
-button:focus,
-button:focus-visible,
-textarea:focus,
-textarea:focus-visible{
-  outline:7px solid #ffd400;
-  outline-offset:4px;
-}
-@media(max-width:600px){
-  main{padding:12px 12px 70px}
-  .top{grid-template-columns:1fr 1fr;gap:14px}
-  .answers{grid-template-columns:1fr;gap:16px}
-  .answer{min-height:118px;font-size:24px}
-  .quick{grid-template-columns:1fr 1fr;gap:14px}
-  .quick button{min-height:108px}
-  .big,.acc-head{min-height:108px}
-}
-@media(max-width:390px){
-  .top{grid-template-columns:1fr}
-  .quick{grid-template-columns:1fr}
-  .big,.answer,.quick button,.acc-head,.full{min-height:104px}
-}
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tonguebox Benutzer</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#10232a}main{max-width:700px;margin:auto;padding:12px}
+h1{text-align:center;font-size:40px}.note,.status{border:2px solid #087f8c;border-radius:18px;padding:12px;text-align:center;margin:12px 0;font-weight:bold}
+.acc{border:2px solid #ccd8dc;border-radius:20px;margin:16px 0;overflow:hidden}.head{width:100%;min-height:108px;border:0;background:#eaf5f6;padding:18px;font-size:24px;font-weight:bold;text-align:left}.panel{display:none;padding:14px}.panel.open{display:block}
+button,input,textarea{font:inherit}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:7px solid #ffd400;outline-offset:3px}
+input,textarea{width:100%;border:3px solid #ccd8dc;border-radius:17px;padding:14px;font-size:21px;margin:6px 0}textarea{min-height:110px}
+.action,.phrase{width:100%;min-height:100px;border:0;border-radius:18px;padding:14px;font-size:22px;font-weight:bold;margin:6px 0}.action{background:#087f8c;color:white}.phrase{background:#edf3f4;color:#10232a}.delete{background:#fff0ef;color:#a61b13}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.grid{grid-template-columns:1fr}.action,.phrase,.head{min-height:110px}}
+</style></head>
+<body><main>
+<h1>🧠 Tonguebox</h1>
+<div class="note">✨ KI-generierte Vorschläge · Internet erforderlich<br>👤 Eigene Phrasen pro Benutzer</div>
+<div class="status" id="status">Aktiver Benutzer: <span id="active">Gast</span></div>
 
-.lock-screen{position:fixed;inset:0;z-index:99999;background:#fff;display:flex;align-items:center;justify-content:center;padding:20px}
-.lock-box{width:min(620px,100%);border:3px solid #087f8c;border-radius:26px;padding:24px;text-align:center}
-.lock-box input{width:100%;min-height:90px;border:4px solid #cfd8dc;border-radius:20px;padding:14px;font-size:28px;text-align:center;margin:14px 0}
-.lock-box button{width:100%;min-height:112px;border:0;border-radius:20px;background:#087f8c;color:#fff;font-size:27px;font-weight:800}
-.lock-error{min-height:32px;color:#a01818;font-weight:800;margin-top:12px}
-</style></head><body><div class="lock-screen" id="lockScreen"><div class="lock-box"><h1>🔒 Tonguebox</h1><p><strong>Bitte Passwort eingeben</strong></p><input id="passwordInput" type="password" aria-label="Passwort" placeholder="Passwort"><button id="unlockButton">🔓 Tonguebox öffnen</button><div class="lock-error" id="lockError" role="alert"></div></div></div><main>
-<h1>🧠 Tonguebox</h1><p class="sub">Sprich mit deinen Augen</p>
-<div class="note">✨ KI-generierte Antwortvorschläge<br>Internetverbindung erforderlich</div>
-<div class="status" id="status" role="status" aria-live="polite">Bereit.</div>
-
-<div class="acc">
-  <button class="acc-head" aria-expanded="false" data-panel="listenPanel">🎧 Frage erkennen <span>⌄</span></button>
-  <div class="panel" id="listenPanel">
-    <div class="top">
-      <button class="big start" id="listen" aria-label="Zuhören starten">🎧 Zuhören</button>
-      <button class="big stop" id="stop" aria-label="Zuhören stoppen">⏹ Stopp</button>
-    </div>
-    <div class="question"><small>Erkannte Frage</small><span id="question">Noch keine Frage erkannt.</span></div>
-  </div>
-</div>
-
-<div class="acc">
-  <button class="acc-head" aria-expanded="false" data-panel="answerPanel">⚡ KI-Antworten <span>⌄</span></button>
-  <div class="panel" id="answerPanel">
-    <div class="answers" id="answers" role="group" aria-label="KI Antwortvorschläge"></div>
-  </div>
-</div>
-
-<div class="acc">
-  <button class="acc-head" aria-expanded="false" data-panel="quick">💬 Sofort-Kommunikation <span>⌄</span></button>
-  <div class="panel" id="quick">
-    <div class="quick">
-      <button data-say="Ja.">✅ Ja</button>
-      <button data-say="Nein.">❌ Nein</button>
-      <button data-say="Einen Moment bitte.">⏳ Moment</button>
-      <button data-say="Bitte wiederholen.">🔁 Wiederholen</button>
-      <button data-say="Bitte langsamer sprechen.">🐢 Langsamer</button>
-      <button data-say="Ich brauche bitte Hilfe.">🙏 Hilfe</button>
-    </div>
-  </div>
-</div>
-
-<div class="acc">
-  <button class="acc-head" aria-expanded="false" data-panel="manual">✍️ Selbst schreiben <span>⌄</span></button>
-  <div class="panel" id="manual">
-    <textarea id="text" placeholder="Frage oder eigenen Satz eingeben"></textarea>
-    <button class="full" id="ask">✨ KI-Antworten erzeugen</button>
-    <button class="full" id="sayOwn">🔊 Meinen Text sprechen</button>
-  </div>
-</div>
-</main><script>const TEST_PASSWORD="Tonguebox2026";
-const lockScreen=document.getElementById("lockScreen"),passwordInput=document.getElementById("passwordInput"),lockError=document.getElementById("lockError");
-function unlockTonguebox(){if(passwordInput.value===TEST_PASSWORD){sessionStorage.setItem("tonguebox_unlocked","1");lockScreen.style.display="none"}else{lockError.textContent="Passwort ist nicht richtig.";passwordInput.value=""}}
-document.getElementById("unlockButton").onclick=unlockTonguebox;
-passwordInput.addEventListener("keydown",e=>{if(e.key==="Enter")unlockTonguebox()});
-if(sessionStorage.getItem("tonguebox_unlocked")==="1")lockScreen.style.display="none";
-
+<section class="acc"><button class="head" data-id="ai">⚡ KI-Antworten ▾</button><div class="panel open" id="ai"><div class="grid" id="answers"></div></div></section>
+<section class="acc"><button class="head" data-id="questionPanel">🧠 Frage beantworten ▾</button><div class="panel" id="questionPanel"><textarea id="question" placeholder="Frage eingeben"></textarea><button class="action" id="ask">✨ KI-Antworten erzeugen</button></div></section>
+<section class="acc"><button class="head" data-id="phrasesPanel">💬 Meine Phrasen ▾</button><div class="panel" id="phrasesPanel"><textarea id="newPhrase" placeholder="Eigene Phrase eingeben"></textarea><button class="action" id="savePhrase">➕ Phrase speichern</button><div id="phrases"></div></div></section>
+<section class="acc"><button class="head" data-id="usersPanel">👤 Benutzer ▾</button><div class="panel" id="usersPanel"><input id="newUser" placeholder="Benutzername"><button class="action" id="addUser">➕ Benutzer anlegen</button><div id="users"></div></div></section>
+<section class="acc"><button class="head" data-id="speakPanel">🔊 Selbst sprechen ▾</button><div class="panel" id="speakPanel"><textarea id="own" placeholder="Text schreiben"></textarea><button class="action" id="speakOwn">🔊 Sprechen</button></div></section>
+</main>
+<script>
 const ENDPOINT="https://tonguebox-ai.restless-bush-f37f.workers.dev/";
-const answers=document.getElementById("answers"),statusEl=document.getElementById("status"),qEl=document.getElementById("question"),textEl=document.getElementById("text");
-let rec=null,wantListen=false,speaking=false;
-function status(t,e=false){statusEl.textContent=t;statusEl.classList.toggle("error",e)}
-function speak(t){if(!t)return;speaking=true;if(rec)try{rec.stop()}catch(e){};speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="de-AT";u.onend=u.onerror=()=>{speaking=false;if(wantListen)start()};speechSynthesis.speak(u)}
-function render(a){const f=["Ja.","Nein.","Einen Moment bitte.","Bitte wiederholen."];a=Array.isArray(a)?a.filter(Boolean).slice(0,4):[];while(a.length<4)a.push(f[a.length]);answers.innerHTML="";a.forEach(t=>{const b=document.createElement("button");b.className="answer";b.textContent=t;b.onclick=()=>speak(t);answers.appendChild(b)})}
-function openPanel(id){
-  document.querySelectorAll(".acc-head").forEach(x=>{
-    const p=document.getElementById(x.dataset.panel);
-    const yes=x.dataset.panel===id;
-    x.setAttribute("aria-expanded",yes?"true":"false");
-    if(p)p.classList.toggle("open",yes);
-  });
-  const h=document.querySelector('.acc-head[data-panel="'+id+'"]');
-  if(h)setTimeout(()=>h.scrollIntoView({behavior:"smooth",block:"start"}),80);
-}
-render(["Ja.","Nein.","Einen Moment bitte.","Bitte wiederholen."]);
-async function askAI(q){q=(q||"").trim();if(!q){status("Bitte zuerst eine Frage eingeben.",true);return}qEl.textContent=q;status("✨ KI erstellt Antworten …");try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q})});const d=await r.json();if(!r.ok)throw new Error(d.detail||d.error||"HTTP "+r.status);if(!Array.isArray(d.replies))throw new Error("Keine Antworten erhalten");render(d.replies);status("✨ KI-generierte Antworten sind bereit.");openPanel("answerPanel")}catch(e){console.error(e);status("KI-Verbindung nicht erreichbar. Sofort-Antworten bleiben verfügbar.",true)}}
-function start(){if(!rec||speaking||!wantListen)return;try{rec.start();status("🎧 Ich höre zu …")}catch(e){}}
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){rec=new SR();rec.lang="de-AT";rec.continuous=false;rec.interimResults=true;rec.onresult=e=>{let fin="",inter="";for(let i=e.resultIndex;i<e.results.length;i++){let t=e.results[i][0].transcript;e.results[i].isFinal?fin+=t:inter+=t}qEl.textContent=fin||inter||"Ich höre zu …";if(fin.trim())askAI(fin)};rec.onend=()=>{if(wantListen&&!speaking)setTimeout(start,500)};rec.onerror=e=>{if(e.error!=="aborted")status("Spracherkennung: "+e.error,true)}}else{document.getElementById("listen").disabled=true;status("Automatisches Zuhören wird in diesem Browser nicht unterstützt. Bitte „Selbst schreiben“ verwenden.",true)}
-document.getElementById("listen").onclick=()=>{wantListen=true;start()};document.getElementById("stop").onclick=()=>{wantListen=false;if(rec)try{rec.stop()}catch(e){};status("Zuhören gestoppt.")};document.getElementById("ask").onclick=()=>askAI(textEl.value);document.getElementById("sayOwn").onclick=()=>speak(textEl.value.trim());document.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>speak(b.dataset.say));
-document.querySelectorAll(".acc-head").forEach(h=>h.onclick=()=>{const open=h.getAttribute("aria-expanded")!=="true";document.querySelectorAll(".acc-head").forEach(x=>{x.setAttribute("aria-expanded","false");document.getElementById(x.dataset.panel).classList.remove("open")});if(open){h.setAttribute("aria-expanded","true");document.getElementById(h.dataset.panel).classList.add("open");setTimeout(()=>h.scrollIntoView({behavior:"smooth",block:"start"}),50)}});openPanel("listenPanel");
+const UKEY="tonguebox_users_v1",AKEY="tonguebox_active_v1";
+const $=id=>document.getElementById(id);
+function users(){try{return JSON.parse(localStorage.getItem(UKEY))||{Gast:{phrases:[]}}}catch(e){return {Gast:{phrases:[]}}}}
+function save(u){localStorage.setItem(UKEY,JSON.stringify(u))}
+function active(){return localStorage.getItem(AKEY)||"Gast"}
+function phrases(){let u=users();return u[active()]?.phrases||[]}
+function say(t){if(!t)return;speechSynthesis.cancel();let x=new SpeechSynthesisUtterance(t);x.lang="de-AT";speechSynthesis.speak(x)}
+function renderAnswers(a){let f=["Ja.","Nein.","Einen Moment bitte.","Bitte wiederholen."];a=Array.isArray(a)?a.slice(0,4):[];while(a.length<4)a.push(f[a.length]);$("answers").innerHTML="";a.forEach(t=>{let b=document.createElement("button");b.className="action";b.textContent=t;b.onclick=()=>say(t);$("answers").appendChild(b)})}
+function renderPhrases(){$("phrases").innerHTML="";phrases().forEach(t=>{let b=document.createElement("button");b.className="phrase";b.textContent=t;b.onclick=()=>say(t);let d=document.createElement("button");d.className="phrase delete";d.textContent="🗑 "+t;d.onclick=()=>{let u=users();u[active()].phrases=u[active()].phrases.filter(x=>x!==t);save(u);renderPhrases()};$("phrases").append(b,d)})}
+function renderUsers(){$("active").textContent=active();$("users").innerHTML="";Object.keys(users()).forEach(n=>{let b=document.createElement("button");b.className="phrase";b.textContent=(n===active()?"✓ ":"👤 ")+n;b.onclick=()=>{localStorage.setItem(AKEY,n);renderAll()};$("users").appendChild(b)})}
+function renderAll(){renderUsers();renderPhrases()}
+$("savePhrase").onclick=()=>{let t=$("newPhrase").value.trim();if(!t)return;let u=users(),n=active();if(!u[n])u[n]={phrases:[]};if(!u[n].phrases.includes(t))u[n].phrases.push(t);save(u);$("newPhrase").value="";renderPhrases()}
+$("addUser").onclick=()=>{let n=$("newUser").value.trim().replace(/[<>]/g,"").slice(0,30);if(!n)return;let u=users();if(!u[n])u[n]={phrases:[]};save(u);localStorage.setItem(AKEY,n);$("newUser").value="";renderAll()}
+$("ask").onclick=async()=>{let q=$("question").value.trim();if(!q)return;$("status").textContent="✨ KI erstellt Antworten …";try{let r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,preferred_phrases:phrases().slice(0,30)})});let d=await r.json();if(!r.ok)throw Error(d.detail||d.error);renderAnswers(d.replies);$("status").innerHTML="✨ KI-Antworten für <span id='active'>"+active()+"</span> bereit";open("ai")}catch(e){$("status").textContent="KI-Fehler: "+e.message}}
+$("speakOwn").onclick=()=>say($("own").value.trim());
+function open(id){document.querySelectorAll(".panel").forEach(p=>p.classList.remove("open"));$(id).classList.add("open");document.querySelector('[data-id="'+id+'"]').scrollIntoView({behavior:"smooth",block:"start"})}
+document.querySelectorAll(".head").forEach(b=>b.onclick=()=>{let p=$(b.dataset.id);p.classList.contains("open")?p.classList.remove("open"):open(b.dataset.id)});
+renderAnswers([]);renderAll();
 </script></body></html>
