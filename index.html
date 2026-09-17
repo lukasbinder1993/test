@@ -1,160 +1,1585 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Tonguebox – KI</title><style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#10232a;background:#fff;font-size:20px}main{max-width:720px;margin:auto;padding:14px 12px 60px}h1{text-align:center;font-size:44px;margin:8px 0}.sub,.status{text-align:center;font-weight:700}.note{border:2px solid #087f8c;background:#eefafb;border-radius:18px;padding:14px;text-align:center;font-weight:700;margin:12px 0}.top,.answers,.quick{display:grid;grid-template-columns:1fr 1fr;gap:12px}.big,.answer,.full,.quick button,.acc-head{border:0;border-radius:20px;font-weight:800;font-size:23px;min-height:90px;padding:14px}.start,.answer,.full{background:#087f8c;color:#fff}.stop,.quick button{background:#edf2f3;color:#10232a}.answer{min-height:115px}.question{border:2px solid #cfd8dc;background:#f4f8f9;border-radius:18px;padding:14px;min-height:76px;margin:14px 0}.question small{display:block;font-size:15px;font-weight:700}.status{min-height:30px;margin:10px}.error{color:#9b1c1c}.acc{border:2px solid #cfd8dc;border-radius:20px;overflow:hidden;margin:14px 0}.acc-head{width:100%;background:#eaf5f6;text-align:left;display:flex;justify-content:space-between;align-items:center}.panel{display:none;padding:14px}.panel.open{display:block}input{width:100%;min-height:82px;border:3px solid #cfd8dc;border-radius:18px;padding:14px;font:inherit;font-size:22px;margin-bottom:12px}
-textarea{width:100%;min-height:125px;border:3px solid #cfd8dc;border-radius:18px;padding:14px;font:inherit;font-size:22px}.full{width:100%;margin-top:12px}button:focus-visible,textarea:focus-visible{outline:7px solid #ffd400;outline-offset:3px}/* Blickerfassung / iPhone: große, klar getrennte Ziele */
-button{
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<title>Tonguebox – Blickgesteuerte Kommunikation</title>
+
+<style>
+* {
+  box-sizing: border-box;
 }
-.top{gap:18px}
-.answers{gap:18px}
-.big{
-  min-height:112px;
-  font-size:26px;
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fff;
+  color: #10232a;
+  font-size: 20px;
 }
-.answer{
-  min-height:132px;
-  font-size:25px;
-  padding:20px 16px;
+
+main {
+  max-width: 760px;
+  margin: auto;
+  padding: 14px 12px 80px;
 }
-.acc{margin:20px 0}
-.acc-head{
-  min-height:112px;
-  font-size:26px;
-  padding:20px;
+
+h1 {
+  text-align: center;
+  font-size: 42px;
+  margin: 10px 0 4px;
 }
-.quick{gap:16px}
-.quick button{
-  min-height:112px;
-  font-size:24px;
-  padding:18px 12px;
+
+.sub {
+  text-align: center;
+  font-weight: 800;
+  margin-bottom: 14px;
 }
-.full{
-  min-height:106px;
-  font-size:25px;
+
+.info {
+  padding: 14px;
+  border: 2px solid #087f8c;
+  border-radius: 18px;
+  background: #eefafb;
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 15px;
 }
+
+.status {
+  text-align: center;
+  font-weight: 800;
+  min-height: 32px;
+  margin: 12px;
+}
+
+.error {
+  color: #9b1c1c;
+}
+
+/* MODUS */
+
+.mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.mode button {
+  min-height: 115px;
+  border: 0;
+  border-radius: 22px;
+  font-size: 25px;
+  font-weight: 900;
+  padding: 16px;
+}
+
+.mode-active {
+  background: #087f8c;
+  color: white;
+}
+
+.mode-inactive {
+  background: #edf2f3;
+  color: #10232a;
+}
+
+/* AKKORDEON */
+
+.acc {
+  border: 2px solid #cfd8dc;
+  border-radius: 22px;
+  overflow: hidden;
+  margin: 18px 0;
+}
+
+.acc-head {
+  width: 100%;
+  min-height: 110px;
+  border: 0;
+  padding: 18px;
+  background: #eaf5f6;
+  color: #10232a;
+  text-align: left;
+  font-size: 25px;
+  font-weight: 900;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel {
+  display: none;
+  padding: 15px;
+}
+
+.panel.open {
+  display: block;
+}
+
+/* EINGABEN */
+
+textarea,
+input {
+  width: 100%;
+  border: 3px solid #cfd8dc;
+  border-radius: 18px;
+  padding: 16px;
+  font: inherit;
+  font-size: 23px;
+}
+
+textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+input {
+  min-height: 78px;
+  margin-bottom: 12px;
+}
+
+/* BUTTONS */
+
+.full,
+.answer,
+.quick button,
+.yes,
+.no {
+  border: 0;
+  border-radius: 22px;
+  font-weight: 900;
+  font-size: 24px;
+  padding: 18px 14px;
+}
+
+.full {
+  width: 100%;
+  min-height: 105px;
+  margin-top: 14px;
+  background: #087f8c;
+  color: white;
+}
+
+.answers {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.answer {
+  width: 100%;
+  min-height: 125px;
+  background: #087f8c;
+  color: white;
+}
+
+.quick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.quick button {
+  min-height: 110px;
+  background: #edf2f3;
+  color: #10232a;
+}
+
+/* JA / NEIN */
+
+.yesno {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.yes,
+.no {
+  min-height: 150px;
+  font-size: 32px;
+}
+
+.yes {
+  background: #087f8c;
+  color: white;
+}
+
+.no {
+  background: #edf2f3;
+  color: #10232a;
+}
+
+/* ERKANNTE FRAGE */
+
+.question {
+  border: 3px solid #cfd8dc;
+  border-radius: 18px;
+  background: #f4f8f9;
+  padding: 16px;
+  min-height: 90px;
+  margin-bottom: 15px;
+}
+
+.question small {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+/* PROFIL */
+
+.phrase {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.phrase button {
+  min-height: 90px;
+  border: 0;
+  border-radius: 18px;
+  font-size: 21px;
+  font-weight: 800;
+  padding: 14px;
+}
+
+.phrase .speak {
+  background: #087f8c;
+  color: white;
+}
+
+.phrase .delete {
+  background: #edf2f3;
+}
+
+/* FOKUS FÜR BLICKERFASSUNG */
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  cursor: pointer;
+}
+
 button:focus,
 button:focus-visible,
 textarea:focus,
-textarea:focus-visible{
-  outline:7px solid #ffd400;
-  outline-offset:4px;
+textarea:focus-visible,
+input:focus,
+input:focus-visible {
+  outline: 7px solid #ffd400;
+  outline-offset: 4px;
 }
-@media(max-width:600px){
-  main{padding:12px 12px 70px}
-  .top{grid-template-columns:1fr 1fr;gap:14px}
-  .answers{grid-template-columns:1fr;gap:16px}
-  .answer{min-height:118px;font-size:24px}
-  .quick{grid-template-columns:1fr 1fr;gap:14px}
-  .quick button{min-height:108px}
-  .big,.acc-head{min-height:108px}
-}
-@media(max-width:390px){
-  .top{grid-template-columns:1fr}
-  .quick{grid-template-columns:1fr}
-  .big,.answer,.quick button,.acc-head,.full{min-height:104px}
-}
-</style></head><body><main>
-<h1>🧠 Tonguebox</h1><p class="sub">Sprich mit deinen Augen</p>
-<div class="note">✨ KI-generierte Antwortvorschläge<br>Internetverbindung erforderlich</div>
-<div class="status" id="status" role="status" aria-live="polite">Bereit.</div>
 
-<div class="acc">
-  <button class="acc-head" aria-expanded="false" data-panel="listenPanel">🎧 Frage erkennen <span>⌄</span></button>
-  <div class="panel" id="listenPanel">
-    <div class="top">
-      <button class="big start" id="listen" aria-label="Zuhören starten">🎧 Zuhören</button>
-      <button class="big stop" id="stop" aria-label="Zuhören stoppen">⏹ Stopp</button>
-    </div>
-    <div class="question"><small>Erkannte Frage</small><span id="question">Noch keine Frage erkannt.</span></div>
-  </div>
+/* TELEFONMODUS */
+
+body.phone-mode .acc-head {
+  min-height: 120px;
+}
+
+body.phone-mode .answer {
+  min-height: 145px;
+  font-size: 26px;
+}
+
+/* MOBILE */
+
+@media(max-width:600px) {
+
+  main {
+    padding: 12px 12px 80px;
+  }
+
+  h1 {
+    font-size: 37px;
+  }
+
+  .mode {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quick {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .yes,
+  .no {
+    min-height: 145px;
+  }
+}
+
+@media(max-width:390px) {
+
+  .mode {
+    grid-template-columns: 1fr;
+  }
+
+  .quick {
+    grid-template-columns: 1fr;
+  }
+
+  .yesno {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main>
+
+<h1>👁 Tonguebox</h1>
+
+<p class="sub">
+Sprich mit deinen Augen
+</p>
+
+<div class="info">
+Blickoptimierte Kommunikation mit adaptiven Antwortvorschlägen
 </div>
 
-<div class="acc">
-  <button class="acc-head" aria-expanded="false" data-panel="answerPanel">⚡ KI-Antworten <span>⌄</span></button>
-  <div class="panel" id="answerPanel">
-    <div class="answers" id="answers" role="group" aria-label="KI Antwortvorschläge"></div>
-  </div>
+<div
+  class="status"
+  id="status"
+  role="status"
+  aria-live="polite">
+Bereit.
 </div>
 
-<div class="acc">
-  <button class="acc-head" aria-expanded="false" data-panel="quick">💬 Sofort-Kommunikation <span>⌄</span></button>
-  <div class="panel" id="quick">
-    <div class="quick">
-      <button data-say="Ja.">✅ Ja</button>
-      <button data-say="Nein.">❌ Nein</button>
-      <button data-say="Einen Moment bitte.">⏳ Moment</button>
-      <button data-say="Bitte wiederholen.">🔁 Wiederholen</button>
-      <button data-say="Bitte langsamer sprechen.">🐢 Langsamer</button>
-      <button data-say="Ich brauche bitte Hilfe.">🙏 Hilfe</button>
-    </div>
-  </div>
+
+<!-- MODUS -->
+
+<div class="mode">
+
+<button
+  id="communicationMode"
+  class="mode-active">
+💬 Kommunikation
+</button>
+
+<button
+  id="phoneMode"
+  class="mode-inactive">
+📞 Telefon
+</button>
+
 </div>
 
+
+<!-- JA / NEIN -->
+
 <div class="acc">
-  <button class="acc-head" aria-expanded="false" data-panel="manual">✍️ Selbst schreiben <span>⌄</span></button>
-  <div class="panel" id="manual">
-    <textarea id="text" placeholder="Frage oder eigenen Satz eingeben"></textarea>
-    <button class="full" id="ask">✨ KI-Antworten erzeugen</button>
-    <button class="full" id="sayOwn">🔊 Meinen Text sprechen</button>
-  </div>
+
+<button
+  class="acc-head"
+  aria-expanded="true"
+  data-panel="yesNoPanel">
+
+<span>⚡ Schnell antworten</span>
+<span>⌃</span>
+
+</button>
+
+<div
+  class="panel open"
+  id="yesNoPanel">
+
+<div class="yesno">
+
+<button
+  class="yes"
+  data-say="Ja.">
+✅ JA
+</button>
+
+<button
+  class="no"
+  data-say="Nein.">
+❌ NEIN
+</button>
+
 </div>
-</main><script>
-const ENDPOINT="https://tonguebox-ai.restless-bush-f37f.workers.dev/";
-const answers=document.getElementById("answers"),statusEl=document.getElementById("status"),qEl=document.getElementById("question"),textEl=document.getElementById("text");
-let rec=null,wantListen=false,speaking=false;
-function status(t,e=false){statusEl.textContent=t;statusEl.classList.toggle("error",e)}
-function speak(t){if(!t)return;speaking=true;if(rec)try{rec.stop()}catch(e){};speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="de-AT";u.onend=u.onerror=()=>{speaking=false;if(wantListen)start()};speechSynthesis.speak(u)}
-function render(a){const f=["Ja.","Nein.","Einen Moment bitte.","Bitte wiederholen."];a=Array.isArray(a)?a.filter(Boolean).slice(0,4):[];while(a.length<4)a.push(f[a.length]);answers.innerHTML="";a.forEach(t=>{const b=document.createElement("button");b.className="answer";b.textContent=t;b.onclick=()=>speak(t);answers.appendChild(b)})}
-function openPanel(id){
-  
-const USER_PREFIX="tonguebox_user_v1_";
-let activeUser="";
-function phrases(){
-  if(!activeUser)return [];
-  try{return JSON.parse(localStorage.getItem(USER_PREFIX+activeUser.toLowerCase())||"[]")}catch(e){return []}
+
+</div>
+</div>
+
+
+<!-- TELEFON -->
+
+<div class="acc">
+
+<button
+  class="acc-head"
+  aria-expanded="false"
+  data-panel="phonePanel">
+
+<span>📞 Telefon-Soforthilfe</span>
+<span>⌄</span>
+
+</button>
+
+<div
+  class="panel"
+  id="phonePanel">
+
+<div class="quick">
+
+<button data-say="Hallo.">
+👋 Hallo
+</button>
+
+<button data-say="Einen Moment bitte.">
+⏳ Moment
+</button>
+
+<button data-say="Bitte wiederholen Sie das.">
+🔁 Wiederholen
+</button>
+
+<button data-say="Bitte sprechen Sie langsamer.">
+🐢 Langsamer
+</button>
+
+<button data-say="Ich kommuniziere über eine Sprachausgabe.">
+🔊 Sprachausgabe
+</button>
+
+<button data-say="Danke. Auf Wiederhören.">
+☎️ Auf Wiederhören
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- KI -->
+
+<div class="acc">
+
+<button
+  class="acc-head"
+  aria-expanded="false"
+  data-panel="aiPanel">
+
+<span>🧠 Intelligente Antworten</span>
+<span>⌄</span>
+
+</button>
+
+<div
+  class="panel"
+  id="aiPanel">
+
+<textarea
+  id="questionInput"
+  placeholder="Frage oder Gesprächssituation eingeben"
+  aria-label="Frage oder Gesprächssituation">
+</textarea>
+
+<button
+  class="full"
+  id="askAI">
+✨ Antworten erzeugen
+</button>
+
+<div
+  class="question">
+
+<small>
+Aktuelle Frage / Situation
+</small>
+
+<span id="currentQuestion">
+Noch keine Frage eingegeben.
+</span>
+
+</div>
+
+<div
+  class="answers"
+  id="answers"
+  role="group"
+  aria-label="Antwortvorschläge">
+</div>
+
+</div>
+</div>
+
+
+<!-- EIGENER TEXT -->
+
+<div class="acc">
+
+<button
+  class="acc-head"
+  aria-expanded="false"
+  data-panel="writePanel">
+
+<span>✍️ Selbst schreiben</span>
+<span>⌄</span>
+
+</button>
+
+<div
+  class="panel"
+  id="writePanel">
+
+<textarea
+  id="ownText"
+  placeholder="Was möchtest du sagen?"
+  aria-label="Eigenen Text schreiben">
+</textarea>
+
+<button
+  class="full"
+  id="speakOwn">
+🔊 Sprechen
+</button>
+
+</div>
+</div>
+
+
+<!-- PERSÖNLICHE PHRASEN -->
+
+<div class="acc">
+
+<button
+  class="acc-head"
+  aria-expanded="false"
+  data-panel="profilePanel">
+
+<span>👤 Meine Phrasen</span>
+<span>⌄</span>
+
+</button>
+
+<div
+  class="panel"
+  id="profilePanel">
+
+<input
+  id="userName"
+  type="text"
+  placeholder="Benutzername"
+  aria-label="Benutzername">
+
+<button
+  class="full"
+  id="openUser">
+👤 Profil öffnen
+</button>
+
+<p>
+Aktives Profil:
+<strong id="activeUser">Keines</strong>
+</p>
+
+<input
+  id="newPhrase"
+  type="text"
+  placeholder="Neue persönliche Phrase"
+  aria-label="Neue persönliche Phrase">
+
+<button
+  class="full"
+  id="savePhrase">
+💾 Phrase speichern
+</button>
+
+<div id="userPhrases"></div>
+
+</div>
+</div>
+
+</main>
+
+
+<script>
+
+/* ========================================
+   TONGUEBOX PATENT-TEST
+======================================== */
+
+const ENDPOINT =
+"https://tonguebox-ai.restless-bush-f37f.workers.dev/";
+
+const statusEl =
+document.getElementById("status");
+
+const answersEl =
+document.getElementById("answers");
+
+const questionInput =
+document.getElementById("questionInput");
+
+const currentQuestion =
+document.getElementById("currentQuestion");
+
+const ownText =
+document.getElementById("ownText");
+
+let currentMode = "communication";
+
+
+/* ========================================
+   STATUS
+======================================== */
+
+function setStatus(text, error=false) {
+
+  statusEl.textContent = text;
+
+  statusEl.classList.toggle(
+    "error",
+    error
+  );
 }
-function savePhrases(a){try{localStorage.setItem(USER_PREFIX+activeUser.toLowerCase(),JSON.stringify(a))}catch(e){}}
-function renderUser(){
-  const box=document.getElementById("userPhrases");box.innerHTML="";
-  phrases().forEach((p,i)=>{
-    const wrap=document.createElement("div");
-    const b=document.createElement("button");b.textContent=p;b.onclick=()=>speak(p);
-    const d=document.createElement("button");d.textContent="🗑 Löschen";d.onclick=()=>{let a=phrases();a.splice(i,1);savePhrases(a);renderUser()};
-    wrap.append(b,d);box.appendChild(wrap);
+
+
+/* ========================================
+   SPRACHAUSGABE
+======================================== */
+
+function speak(text) {
+
+  text = (text || "").trim();
+
+  if (!text) {
+    return;
+  }
+
+  if (!("speechSynthesis" in window)) {
+
+    setStatus(
+      "Sprachausgabe wird von diesem Browser nicht unterstützt.",
+      true
+    );
+
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  const utterance =
+    new SpeechSynthesisUtterance(text);
+
+  utterance.lang = "de-AT";
+
+  utterance.rate = 1;
+
+  utterance.onstart = function() {
+
+    setStatus(
+      "🔊 Tonguebox spricht …"
+    );
+  };
+
+  utterance.onend = function() {
+
+    setStatus(
+      "Bereit."
+    );
+  };
+
+  utterance.onerror = function() {
+
+    setStatus(
+      "Sprachausgabe konnte nicht gestartet werden.",
+      true
+    );
+  };
+
+  speechSynthesis.speak(
+    utterance
+  );
+}
+
+
+/* ========================================
+   DATA-SAY BUTTONS
+======================================== */
+
+document
+.querySelectorAll("[data-say]")
+.forEach(function(button) {
+
+  button.addEventListener(
+    "click",
+    function() {
+
+      speak(
+        button.dataset.say
+      );
+    }
+  );
+
+});
+
+
+/* ========================================
+   AKKORDEON
+======================================== */
+
+function openPanel(id) {
+
+  document
+  .querySelectorAll(".acc-head")
+  .forEach(function(header) {
+
+    const panel =
+      document.getElementById(
+        header.dataset.panel
+      );
+
+    const shouldOpen =
+      header.dataset.panel === id;
+
+    header.setAttribute(
+      "aria-expanded",
+      shouldOpen ? "true" : "false"
+    );
+
+    if (panel) {
+
+      panel.classList.toggle(
+        "open",
+        shouldOpen
+      );
+    }
+
+    const arrow =
+      header.querySelector(
+        "span:last-child"
+      );
+
+    if (arrow) {
+
+      arrow.textContent =
+        shouldOpen ? "⌃" : "⌄";
+    }
+
   });
+
+
+  const selected =
+    document.querySelector(
+      '.acc-head[data-panel="' +
+      id +
+      '"]'
+    );
+
+  if (selected) {
+
+    setTimeout(function() {
+
+      selected.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+    }, 80);
+  }
 }
-document.getElementById("openUser").onclick=()=>{
-  const n=document.getElementById("userName").value.trim().slice(0,40);
-  if(!n){status("Bitte Benutzernamen eingeben.",true);return}
-  activeUser=n;document.getElementById("activeUser").textContent=n;
-  document.getElementById("profileArea").style.display="block";
-  try{localStorage.setItem("tonguebox_active_user",n)}catch(e){}
-  renderUser();status("👤 Profil "+n+" geöffnet.");
-};
-document.getElementById("savePhrase").onclick=()=>{
-  if(!activeUser){status("Bitte zuerst Profil öffnen.",true);return}
-  const x=document.getElementById("newPhrase"),p=x.value.trim();if(!p)return;
-  let a=phrases();if(!a.includes(p))a.push(p);savePhrases(a);x.value="";renderUser();status("💬 Phrase gespeichert.");
-};
-try{
- const n=localStorage.getItem("tonguebox_active_user");
- if(n){document.getElementById("userName").value=n;document.getElementById("openUser").click()}
-}catch(e){}
-document.querySelectorAll(".acc-head").forEach(x=>{
-    const p=document.getElementById(x.dataset.panel);
-    const yes=x.dataset.panel===id;
-    x.setAttribute("aria-expanded",yes?"true":"false");
-    if(p)p.classList.toggle("open",yes);
-  });
-  const h=document.querySelector('.acc-head[data-panel="'+id+'"]');
-  if(h)setTimeout(()=>h.scrollIntoView({behavior:"smooth",block:"start"}),80);
+
+
+document
+.querySelectorAll(".acc-head")
+.forEach(function(header) {
+
+  header.addEventListener(
+    "click",
+    function() {
+
+      const id =
+        header.dataset.panel;
+
+      const currentlyOpen =
+        header.getAttribute(
+          "aria-expanded"
+        ) === "true";
+
+      if (currentlyOpen) {
+
+        header.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        document
+        .getElementById(id)
+        .classList.remove("open");
+
+        const arrow =
+          header.querySelector(
+            "span:last-child"
+          );
+
+        if (arrow) {
+          arrow.textContent = "⌄";
+        }
+
+      } else {
+
+        openPanel(id);
+      }
+
+    }
+  );
+
+});
+
+
+/* ========================================
+   KOMMUNIKATIONS-MODUS
+======================================== */
+
+const communicationMode =
+document.getElementById(
+  "communicationMode"
+);
+
+const phoneMode =
+document.getElementById(
+  "phoneMode"
+);
+
+
+function setMode(mode) {
+
+  currentMode = mode;
+
+  if (mode === "phone") {
+
+    document.body.classList.add(
+      "phone-mode"
+    );
+
+    phoneMode.className =
+      "mode-active";
+
+    communicationMode.className =
+      "mode-inactive";
+
+    setStatus(
+      "📞 Telefonmodus aktiviert."
+    );
+
+    openPanel(
+      "phonePanel"
+    );
+
+  } else {
+
+    document.body.classList.remove(
+      "phone-mode"
+    );
+
+    communicationMode.className =
+      "mode-active";
+
+    phoneMode.className =
+      "mode-inactive";
+
+    setStatus(
+      "💬 Kommunikationsmodus aktiviert."
+    );
+
+    openPanel(
+      "yesNoPanel"
+    );
+  }
 }
-render(["Ja.","Nein.","Einen Moment bitte.","Bitte wiederholen."]);
-async function askAI(q){q=(q||"").trim();if(!q){status("Bitte zuerst eine Frage eingeben.",true);return}qEl.textContent=q;status("✨ KI erstellt Antworten …");try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q})});const d=await r.json();if(!r.ok)throw new Error(d.detail||d.error||"HTTP "+r.status);if(!Array.isArray(d.replies))throw new Error("Keine Antworten erhalten");render(d.replies);status("✨ KI-generierte Antworten sind bereit.");openPanel("answerPanel")}catch(e){console.error(e);status("KI-Verbindung nicht erreichbar. Sofort-Antworten bleiben verfügbar.",true)}}
-function start(){if(!rec||speaking||!wantListen)return;try{rec.start();status("🎧 Ich höre zu …")}catch(e){}}
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){rec=new SR();rec.lang="de-AT";rec.continuous=false;rec.interimResults=true;rec.onresult=e=>{let fin="",inter="";for(let i=e.resultIndex;i<e.results.length;i++){let t=e.results[i][0].transcript;e.results[i].isFinal?fin+=t:inter+=t}qEl.textContent=fin||inter||"Ich höre zu …";if(fin.trim())askAI(fin)};rec.onend=()=>{if(wantListen&&!speaking)setTimeout(start,500)};rec.onerror=e=>{if(e.error!=="aborted")status("Spracherkennung: "+e.error,true)}}else{document.getElementById("listen").disabled=true;status("Automatisches Zuhören wird in diesem Browser nicht unterstützt. Bitte „Selbst schreiben“ verwenden.",true)}
-document.getElementById("listen").onclick=()=>{wantListen=true;start()};document.getElementById("stop").onclick=()=>{wantListen=false;if(rec)try{rec.stop()}catch(e){};status("Zuhören gestoppt.")};document.getElementById("ask").onclick=()=>askAI(textEl.value);document.getElementById("sayOwn").onclick=()=>speak(textEl.value.trim());document.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>speak(b.dataset.say));
-document.querySelectorAll(".acc-head").forEach(h=>h.onclick=()=>{const open=h.getAttribute("aria-expanded")!=="true";document.querySelectorAll(".acc-head").forEach(x=>{x.setAttribute("aria-expanded","false");document.getElementById(x.dataset.panel).classList.remove("open")});if(open){h.setAttribute("aria-expanded","true");document.getElementById(h.dataset.panel).classList.add("open");setTimeout(()=>h.scrollIntoView({behavior:"smooth",block:"start"}),50)}});openPanel("listenPanel");
-</script></body></html>
+
+
+communicationMode.onclick =
+function() {
+
+  setMode(
+    "communication"
+  );
+};
+
+
+phoneMode.onclick =
+function() {
+
+  setMode(
+    "phone"
+  );
+};
+
+
+/* ========================================
+   JA/NEIN ERKENNUNG
+======================================== */
+
+function looksLikeYesNoQuestion(text) {
+
+  const q =
+    text
+    .trim()
+    .toLowerCase();
+
+  const starts = [
+
+    "bist ",
+    "bist du",
+    "hast ",
+    "hast du",
+    "kannst ",
+    "kannst du",
+    "möchtest ",
+    "möchtest du",
+    "willst ",
+    "willst du",
+    "soll ",
+    "soll ich",
+    "darf ",
+    "darf ich",
+    "ist ",
+    "sind ",
+    "war ",
+    "waren ",
+    "kommst ",
+    "gehst ",
+    "brauchst ",
+    "magst "
+
+  ];
+
+  return starts.some(
+    function(start) {
+
+      return q.startsWith(start);
+    }
+  );
+}
+
+
+/* ========================================
+   ANTWORTEN ANZEIGEN
+======================================== */
+
+function renderAnswers(list) {
+
+  answersEl.innerHTML = "";
+
+  let replies =
+    Array.isArray(list)
+    ? list.filter(Boolean)
+    : [];
+
+  replies =
+    replies.slice(0,4);
+
+  const fallback = [
+
+    "Ja.",
+    "Nein.",
+    "Einen Moment bitte.",
+    "Bitte wiederholen."
+
+  ];
+
+  while (
+    replies.length < 4
+  ) {
+
+    replies.push(
+      fallback[
+        replies.length
+      ]
+    );
+  }
+
+
+  replies.forEach(
+    function(text) {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+      button.className =
+        "answer";
+
+      button.textContent =
+        text;
+
+      button.setAttribute(
+        "aria-label",
+        "Antwort: " + text
+      );
+
+      button.onclick =
+        function() {
+
+          speak(text);
+        };
+
+      answersEl.appendChild(
+        button
+      );
+    }
+  );
+}
+
+
+/* ========================================
+   KI
+======================================== */
+
+async function askAI(question) {
+
+  question =
+    (question || "").trim();
+
+  if (!question) {
+
+    setStatus(
+      "Bitte zuerst eine Frage eingeben.",
+      true
+    );
+
+    return;
+  }
+
+
+  currentQuestion.textContent =
+    question;
+
+
+  /*
+    ADAPTIVE BLICKOBERFLÄCHE
+
+    Wird eine Ja/Nein-Frage erkannt,
+    wird zuerst die reduzierte
+    Ja/Nein-Oberfläche angezeigt.
+  */
+
+  if (
+    looksLikeYesNoQuestion(
+      question
+    )
+  ) {
+
+    setStatus(
+      "⚡ Ja/Nein-Frage erkannt."
+    );
+
+    openPanel(
+      "yesNoPanel"
+    );
+
+  } else {
+
+    openPanel(
+      "aiPanel"
+    );
+  }
+
+
+  setStatus(
+    "🧠 Antworten werden erstellt …"
+  );
+
+
+  try {
+
+    const response =
+      await fetch(
+        ENDPOINT,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              question:
+                question,
+
+              mode:
+                currentMode
+
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.detail ||
+        data.error ||
+        "HTTP " +
+        response.status
+      );
+    }
+
+
+    if (
+      !Array.isArray(
+        data.replies
+      )
+    ) {
+
+      throw new Error(
+        "Keine Antworten erhalten."
+      );
+    }
+
+
+    renderAnswers(
+      data.replies
+    );
+
+
+    setStatus(
+      "✨ Antworten sind bereit."
+    );
+
+
+    /*
+      Bei normalen Fragen:
+      Antworten anzeigen.
+
+      Bei Ja/Nein-Fragen:
+      JA/NEIN bleibt zuerst sichtbar.
+    */
+
+    if (
+      !looksLikeYesNoQuestion(
+        question
+      )
+    ) {
+
+      openPanel(
+        "aiPanel"
+      );
+    }
+
+  }
+
+  catch(error) {
+
+    console.error(error);
+
+    setStatus(
+      "KI-Verbindung nicht erreichbar. Schnellkommunikation bleibt verfügbar.",
+      true
+    );
+
+    renderAnswers([
+      "Ja.",
+      "Nein.",
+      "Einen Moment bitte.",
+      "Bitte wiederholen."
+    ]);
+  }
+}
+
+
+document
+.getElementById(
+  "askAI"
+)
+.onclick =
+function() {
+
+  askAI(
+    questionInput.value
+  );
+};
+
+
+/* ========================================
+   EIGENER TEXT
+======================================== */
+
+document
+.getElementById(
+  "speakOwn"
+)
+.onclick =
+function() {
+
+  speak(
+    ownText.value
+  );
+};
+
+
+/* ========================================
+   BENUTZERPROFILE
+======================================== */
+
+const USER_PREFIX =
+"tonguebox_patent_user_";
+
+let activeUser = "";
+
+
+function getPhrases() {
+
+  if (!activeUser) {
+    return [];
+  }
+
+  try {
+
+    return JSON.parse(
+      localStorage.getItem(
+        USER_PREFIX +
+        activeUser.toLowerCase()
+      ) || "[]"
+    );
+
+  }
+
+  catch(error) {
+
+    return [];
+  }
+}
+
+
+function savePhrases(
+  phrases
+) {
+
+  if (!activeUser) {
+    return;
+  }
+
+  try {
+
+    localStorage.setItem(
+      USER_PREFIX +
+      activeUser.toLowerCase(),
+
+      JSON.stringify(
+        phrases
+      )
+    );
+
+  }
+
+  catch(error) {
+
+    console.error(error);
+  }
+}
+
+
+function renderUserPhrases() {
+
+  const container =
+    document.getElementById(
+      "userPhrases"
+    );
+
+  container.innerHTML = "";
+
+
+  getPhrases()
+  .forEach(
+    function(phrase,index) {
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+      row.className =
+        "phrase";
+
+
+      const speakButton =
+        document.createElement(
+          "button"
+        );
+
+      speakButton.className =
+        "speak";
+
+      speakButton.textContent =
+        phrase;
+
+      speakButton.onclick =
+        function() {
+
+          speak(
+            phrase
+          );
+        };
+
+
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
+
+      deleteButton.className =
+        "delete";
+
+      deleteButton.textContent =
+        "🗑";
+
+      deleteButton.setAttribute(
+        "aria-label",
+        "Phrase löschen"
+      );
+
+      deleteButton.onclick =
+        function() {
+
+          const phrases =
+            getPhrases();
+
+          phrases.splice(
+            index,
+            1
+          );
+
+          savePhrases(
+            phrases
+          );
+
+          renderUserPhrases();
+
+          setStatus(
+            "Phrase gelöscht."
+          );
+        };
+
+
+      row.appendChild(
+        speakButton
+      );
+
+      row.appendChild(
+        deleteButton
+      );
+
+      container.appendChild(
+        row
+      );
+
+    }
+  );
+}
+
+
+/* PROFIL ÖFFNEN */
+
+document
+.getElementById(
+  "openUser"
+)
+.onclick =
+function() {
+
+  const name =
+    document
+    .getElementById(
+      "userName"
+    )
+    .value
+    .trim()
+    .slice(0,40);
+
+
+  if (!name) {
+
+    setStatus(
+      "Bitte einen Benutzernamen eingeben.",
+      true
+    );
+
+    return;
+  }
+
+
+  activeUser =
+    name;
+
+
+  document
+  .getElementById(
+    "activeUser"
+  )
+  .textContent =
+    name;
+
+
+  try {
+
+    localStorage.setItem(
+      "tonguebox_active_user",
+      name
+    );
+
+  }
+
+  catch(error) {}
+
+
+  renderUserPhrases();
+
+
+  setStatus(
+    "👤 Profil " +
+    name +
+    " geöffnet."
+  );
+};
+
+
+/* PHRASE SPEICHERN */
+
+document
+.getElementById(
+  "savePhrase"
+)
+.onclick =
+function() {
+
+  if (!activeUser) {
+
+    setStatus(
+      "Bitte zuerst ein Profil öffnen.",
+      true
+    );
+
+    return;
+  }
+
+
+  const input =
+    document.getElementById(
+      "newPhrase"
+    );
+
+  const phrase =
+    input.value.trim();
+
+
+  if (!phrase) {
+
+    setStatus(
+      "Bitte eine Phrase eingeben.",
+      true
+    );
+
+    return;
+  }
+
+
+  const phrases =
+    getPhrases();
+
+
+  if (
+    !phrases.includes(
+      phrase
+    )
+  ) {
+
+    phrases.push(
+      phrase
+    );
+
+    savePhrases(
+      phrases
+    );
+  }
+
+
+  input.value = "";
+
+
+  renderUserPhrases();
+
+
+  setStatus(
+    "💬 Phrase gespeichert."
+  );
+};
+
+
+/* ========================================
+   PROFIL WIEDERHERSTELLEN
+======================================== */
+
+try {
+
+  const savedUser =
+    localStorage.getItem(
+      "tonguebox_active_user"
+    );
+
+  if (savedUser) {
+
+    document
+    .getElementById(
+      "userName"
+    )
+    .value =
+      savedUser;
+
+    activeUser =
+      savedUser;
+
+    document
+    .getElementById(
+      "activeUser"
+    )
+    .textContent =
+      savedUser;
+
+    renderUserPhrases();
+  }
+
+}
+
+catch(error) {}
+
+
+/* ========================================
+   START
+======================================== */
+
+renderAnswers([
+  "Ja.",
+  "Nein.",
+  "Einen Moment bitte.",
+  "Bitte wiederholen."
+]);
+
+setMode(
+  "communication"
+);
+
+</script>
+
+</body>
+</html>
