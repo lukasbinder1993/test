@@ -55,34 +55,17 @@ textarea:focus-visible{
   .big,.answer,.quick button,.acc-head,.full{min-height:104px}
 }
 
-.profile-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.phrase-list{display:grid;gap:12px;margin-top:14px}
-.phrase-item{display:grid;grid-template-columns:1fr 90px;gap:10px}
-.phrase-say,.phrase-delete{min-height:100px;border:0;border-radius:18px;font-weight:800;font-size:21px;padding:12px}
-.phrase-say{background:#087f8c;color:#fff}.phrase-delete{background:#b42318;color:#fff}
-select,input{width:100%;min-height:78px;border:3px solid #cfd8dc;border-radius:18px;padding:12px;font:inherit;font-size:21px;background:#fff}
-label{display:block;font-weight:800;margin:8px 0}
-@media(max-width:480px){.profile-row{grid-template-columns:1fr}}
+.loginbox{border:3px solid #087f8c;border-radius:22px;padding:18px;margin:16px 0;background:#f5fbfc}
+.loginbox input{width:100%;min-height:76px;border:3px solid #cfd8dc;border-radius:16px;padding:12px;font:inherit;font-size:22px;margin:7px 0}
+.login-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px}.userline{text-align:center;font-weight:800;margin:10px 0}
+.phrase-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin:10px 0}.phrase-row button{min-height:90px;border:0;border-radius:18px;font-size:21px;font-weight:800}
+.phrase-say{background:#087f8c;color:#fff}.phrase-del{background:#f4e7e7;color:#7b1010;min-width:92px}.hidden{display:none!important}
+@media(max-width:480px){.login-actions{grid-template-columns:1fr}}
 </style></head><body><main>
 <h1>🧠 Tonguebox</h1><p class="sub">Sprich mit deinen Augen</p>
-<div class="note">✨ KI-generierte Antwortvorschläge<br>Internetverbindung erforderlich</div>
+<div class="note">✨ KI-generierte Antwortvorschläge<br>Internetverbindung erforderlich</div><div class="loginbox" id="loginBox"><div class="userline">👤 Persönliches Profil</div><input id="username" autocomplete="username" placeholder="Benutzername"><input id="password" type="password" autocomplete="current-password" placeholder="Passwort"><div class="login-actions"><button class="full" id="loginBtn">🔓 Anmelden</button><button class="full" id="registerBtn">➕ Registrieren</button></div><div class="status" id="loginStatus">Noch nicht angemeldet.</div></div><div class="loginbox hidden" id="profileBox"><div class="userline">👤 Angemeldet als <span id="currentUser"></span></div><button class="full" id="logoutBtn">🚪 Abmelden</button></div>
 <div class="status" id="status" role="status" aria-live="polite">Bereit.</div>
 
-<div class="acc">
-<button class="acc-head" aria-expanded="false" data-panel="userPanel">👤 Benutzer <span>⌄</span></button>
-<div class="panel" id="userPanel">
-<label for="userSelect">Aktiver Benutzer</label><select id="userSelect"></select>
-<div class="profile-row" style="margin-top:14px"><input id="newUserName" placeholder="Neuer Benutzername"><button class="full" id="addUser" style="margin-top:0">➕ Benutzer</button></div>
-<button class="full" id="deleteUser">🗑 Benutzer löschen</button>
-<div class="question"><small>Aktuell</small><span id="activeUserLabel">Standard</span></div>
-</div></div>
-<div class="acc">
-<button class="acc-head" aria-expanded="false" data-panel="phrasePanel">⭐ Meine Phrasen <span>⌄</span></button>
-<div class="panel" id="phrasePanel">
-<textarea id="newPhrase" placeholder="Eigene Phrase eingeben …"></textarea>
-<button class="full" id="addPhrase">➕ Phrase speichern</button>
-<div class="phrase-list" id="phraseList"></div>
-</div></div>
 <div class="acc">
   <button class="acc-head" aria-expanded="false" data-panel="listenPanel">🎧 Frage erkennen <span>⌄</span></button>
   <div class="panel" id="listenPanel">
@@ -115,6 +98,8 @@ label{display:block;font-weight:800;margin:8px 0}
   </div>
 </div>
 
+<div class="acc"><button class="acc-head" aria-expanded="false" data-panel="myPhrases">⭐ Meine Phrasen <span>⌄</span></button><div class="panel" id="myPhrases"><textarea id="newPhrase" placeholder="Eigene Phrase eingeben"></textarea><button class="full" id="savePhrase">➕ Phrase speichern</button><div id="phraseList"></div></div></div>
+
 <div class="acc">
   <button class="acc-head" aria-expanded="false" data-panel="manual">✍️ Selbst schreiben <span>⌄</span></button>
   <div class="panel" id="manual">
@@ -124,28 +109,14 @@ label{display:block;font-weight:800;margin:8px 0}
   </div>
 </div>
 </main><script>
-const ENDPOINT="https://tonguebox-ai.restless-bush-f37f.workers.dev/";
+const ENDPOINT="https://tonguebox-ai.restless-bush-f37f.workers.dev/";const USERS_ENDPOINT="https://tonguebox-users.restless-bush-f37f.workers.dev/";let authToken=localStorage.getItem("tonguebox_token")||"";let personalPhrases=[];
 const answers=document.getElementById("answers"),statusEl=document.getElementById("status"),qEl=document.getElementById("question"),textEl=document.getElementById("text");
 let rec=null,wantListen=false,speaking=false;
 function status(t,e=false){statusEl.textContent=t;statusEl.classList.toggle("error",e)}
 function speak(t){if(!t)return;speaking=true;if(rec)try{rec.stop()}catch(e){};speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="de-AT";u.onend=u.onerror=()=>{speaking=false;if(wantListen)start()};speechSynthesis.speak(u)}
 function render(a){const f=["Ja.","Nein.","Einen Moment bitte.","Bitte wiederholen."];a=Array.isArray(a)?a.filter(Boolean).slice(0,4):[];while(a.length<4)a.push(f[a.length]);answers.innerHTML="";a.forEach(t=>{const b=document.createElement("button");b.className="answer";b.textContent=t;b.onclick=()=>speak(t);answers.appendChild(b)})}
 function openPanel(id){
-  const USER_KEY="tonguebox_users_v1",ACTIVE_KEY="tonguebox_active_user_v1";
-function loadUsers(){try{return JSON.parse(localStorage.getItem(USER_KEY)||"{}")}catch(e){return {}}}
-function saveUsers(u){try{localStorage.setItem(USER_KEY,JSON.stringify(u))}catch(e){}}
-function activeUser(){try{return localStorage.getItem(ACTIVE_KEY)||"Standard"}catch(e){return "Standard"}}
-function getCurrentPhrases(){const u=loadUsers()[activeUser()];return u&&Array.isArray(u.phrases)?u.phrases:[]}
-function setActiveUser(n){try{localStorage.setItem(ACTIVE_KEY,n)}catch(e){}renderUsers();renderPhrases()}
-function ensureUsers(){let u=loadUsers();if(!u.Standard)u.Standard={phrases:[]};if(!u[activeUser()])try{localStorage.setItem(ACTIVE_KEY,"Standard")}catch(e){}saveUsers(u)}
-function renderUsers(){const u=loadUsers(),s=document.getElementById("userSelect");s.innerHTML="";Object.keys(u).sort().forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;o.selected=n===activeUser();s.appendChild(o)});document.getElementById("activeUserLabel").textContent=activeUser()}
-function renderPhrases(){const box=document.getElementById("phraseList");box.innerHTML="";const p=getCurrentPhrases();if(!p.length){box.innerHTML='<div class="question">Noch keine eigenen Phrasen gespeichert.</div>';return}p.forEach((t,i)=>{const r=document.createElement("div");r.className="phrase-item";const b=document.createElement("button");b.className="phrase-say";b.textContent=t;b.onclick=()=>speak(t);const d=document.createElement("button");d.className="phrase-delete";d.textContent="🗑";d.setAttribute("aria-label","Phrase löschen");d.onclick=()=>{let u=loadUsers();u[activeUser()].phrases.splice(i,1);saveUsers(u);renderPhrases()};r.append(b,d);box.appendChild(r)})}
-document.getElementById("userSelect").onchange=e=>setActiveUser(e.target.value);
-document.getElementById("addUser").onclick=()=>{const x=document.getElementById("newUserName"),n=x.value.trim();if(!n){status("Bitte Benutzernamen eingeben.",true);return}let u=loadUsers();if(!u[n])u[n]={phrases:[]};saveUsers(u);x.value="";setActiveUser(n);status("👤 "+n+" ist aktiv.")};
-document.getElementById("deleteUser").onclick=()=>{const n=activeUser();if(n==="Standard"){status("Standard bleibt erhalten.",true);return}let u=loadUsers();delete u[n];saveUsers(u);setActiveUser("Standard");status("Benutzer gelöscht.")};
-document.getElementById("addPhrase").onclick=()=>{const x=document.getElementById("newPhrase"),p=x.value.trim();if(!p){status("Bitte Phrase eingeben.",true);return}let u=loadUsers(),n=activeUser();if(!u[n])u[n]={phrases:[]};if(!u[n].phrases.includes(p))u[n].phrases.push(p);saveUsers(u);x.value="";renderPhrases();status("⭐ Phrase gespeichert.")};
-ensureUsers();renderUsers();renderPhrases();
-document.querySelectorAll(".acc-head").forEach(x=>{
+  document.querySelectorAll(".acc-head").forEach(x=>{
     const p=document.getElementById(x.dataset.panel);
     const yes=x.dataset.panel===id;
     x.setAttribute("aria-expanded",yes?"true":"false");
@@ -155,9 +126,18 @@ document.querySelectorAll(".acc-head").forEach(x=>{
   if(h)setTimeout(()=>h.scrollIntoView({behavior:"smooth",block:"start"}),80);
 }
 render(["Ja.","Nein.","Einen Moment bitte.","Bitte wiederholen."]);
-async function askAI(q){q=(q||"").trim();if(!q){status("Bitte zuerst eine Frage eingeben.",true);return}qEl.textContent=q;status("✨ KI erstellt Antworten …");try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,user:activeUser(),personal_phrases:getCurrentPhrases(),instruction:"Bevorzuge passende persönliche Phrasen, wenn sie zur Frage passen."})});const d=await r.json();if(!r.ok)throw new Error(d.detail||d.error||"HTTP "+r.status);if(!Array.isArray(d.replies))throw new Error("Keine Antworten erhalten");render(d.replies);status("✨ KI-generierte Antworten sind bereit.");openPanel("answerPanel")}catch(e){console.error(e);status("KI-Verbindung nicht erreichbar. Sofort-Antworten bleiben verfügbar.",true)}}
+async function askAI(q){q=(q||"").trim();if(!q){status("Bitte zuerst eine Frage eingeben.",true);return}qEl.textContent=q;status("✨ KI erstellt Antworten …");try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,personalPhrases:personalPhrases.slice(0,30)})});const d=await r.json();if(!r.ok)throw new Error(d.detail||d.error||"HTTP "+r.status);if(!Array.isArray(d.replies))throw new Error("Keine Antworten erhalten");render(d.replies);status("✨ KI-generierte Antworten sind bereit.");openPanel("answerPanel")}catch(e){console.error(e);status("KI-Verbindung nicht erreichbar. Sofort-Antworten bleiben verfügbar.",true)}}
 function start(){if(!rec||speaking||!wantListen)return;try{rec.start();status("🎧 Ich höre zu …")}catch(e){}}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){rec=new SR();rec.lang="de-AT";rec.continuous=false;rec.interimResults=true;rec.onresult=e=>{let fin="",inter="";for(let i=e.resultIndex;i<e.results.length;i++){let t=e.results[i][0].transcript;e.results[i].isFinal?fin+=t:inter+=t}qEl.textContent=fin||inter||"Ich höre zu …";if(fin.trim())askAI(fin)};rec.onend=()=>{if(wantListen&&!speaking)setTimeout(start,500)};rec.onerror=e=>{if(e.error!=="aborted")status("Spracherkennung: "+e.error,true)}}else{document.getElementById("listen").disabled=true;status("Automatisches Zuhören wird in diesem Browser nicht unterstützt. Bitte „Selbst schreiben“ verwenden.",true)}
 document.getElementById("listen").onclick=()=>{wantListen=true;start()};document.getElementById("stop").onclick=()=>{wantListen=false;if(rec)try{rec.stop()}catch(e){};status("Zuhören gestoppt.")};document.getElementById("ask").onclick=()=>askAI(textEl.value);document.getElementById("sayOwn").onclick=()=>speak(textEl.value.trim());document.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>speak(b.dataset.say));
 document.querySelectorAll(".acc-head").forEach(h=>h.onclick=()=>{const open=h.getAttribute("aria-expanded")!=="true";document.querySelectorAll(".acc-head").forEach(x=>{x.setAttribute("aria-expanded","false");document.getElementById(x.dataset.panel).classList.remove("open")});if(open){h.setAttribute("aria-expanded","true");document.getElementById(h.dataset.panel).classList.add("open");setTimeout(()=>h.scrollIntoView({behavior:"smooth",block:"start"}),50)}});openPanel("listenPanel");
+
+async function userApi(action,data={}){const r=await fetch(USERS_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",...(authToken?{"Authorization":"Bearer "+authToken}:{})},body:JSON.stringify({action,...data})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Serverfehler");return d}
+function renderPhrases(){const box=document.getElementById("phraseList");box.innerHTML="";if(!personalPhrases.length){box.innerHTML="<p>Noch keine eigenen Phrasen gespeichert.</p>";return}personalPhrases.forEach(p=>{const row=document.createElement("div");row.className="phrase-row";const a=document.createElement("button");a.className="phrase-say";a.textContent=p;a.onclick=()=>speak(p);const d=document.createElement("button");d.className="phrase-del";d.textContent="🗑️";d.setAttribute("aria-label","Phrase löschen");d.onclick=async()=>{try{const x=await userApi("deletePhrase",{phrase:p});personalPhrases=x.phrases||[];renderPhrases()}catch(e){status(e.message,true)}};row.append(a,d);box.append(row)})}
+function loggedIn(name){document.getElementById("loginBox").classList.add("hidden");document.getElementById("profileBox").classList.remove("hidden");document.getElementById("currentUser").textContent=name}
+function loggedOut(){authToken="";personalPhrases=[];localStorage.removeItem("tonguebox_token");document.getElementById("profileBox").classList.add("hidden");document.getElementById("loginBox").classList.remove("hidden");renderPhrases()}
+async function auth(action){const username=document.getElementById("username").value.trim(),password=document.getElementById("password").value,ls=document.getElementById("loginStatus");if(!username||password.length<6){ls.textContent="Benutzername und Passwort (mindestens 6 Zeichen) eingeben.";return}ls.textContent="Bitte warten …";try{const d=await userApi(action,{username,password});authToken=d.token;localStorage.setItem("tonguebox_token",authToken);personalPhrases=d.phrases||[];loggedIn(d.username);renderPhrases()}catch(e){ls.textContent=e.message}}
+document.getElementById("loginBtn").onclick=()=>auth("login");document.getElementById("registerBtn").onclick=()=>auth("register");document.getElementById("logoutBtn").onclick=async()=>{try{await userApi("logout")}catch(e){}loggedOut()};
+document.getElementById("savePhrase").onclick=async()=>{const phrase=document.getElementById("newPhrase").value.trim();if(!authToken){status("Bitte zuerst anmelden.",true);return}if(!phrase)return;try{const d=await userApi("addPhrase",{phrase});personalPhrases=d.phrases||[];document.getElementById("newPhrase").value="";renderPhrases();status("Phrase gespeichert.")}catch(e){status(e.message,true)}};
+(async()=>{renderPhrases();if(authToken)try{const d=await userApi("me");personalPhrases=d.phrases||[];loggedIn(d.username);renderPhrases()}catch(e){loggedOut()}})();
 </script></body></html>
